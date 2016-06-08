@@ -56,29 +56,41 @@ def before_submit(doc, method=None):
     create(doc)
 
 
+def get_db_val(doc, filters, fieldname):
+   try:
+      return frappe.db.get_value(doc, filters, fieldname)
+   except:
+      return None
+
+def set_db_val(doctype, doc_name, field, value):
+   try:
+      return frappe.db.set_value(doctype, doc_type, field, value)
+   except:
+      return None
+
 def on_submit(doc, method=None):
-    if not frappe.db.get_value('Packing Slip', doc.packing_slip, 'oc_tracking_number'):
-        frappe.db.set_value('Packing Slip', doc.packing_slip, 'oc_tracking_number', doc.tracking_number)
+    if not get_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number'):
+        #kk set_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number', doc.tracking_number)
         frappe.msgprint('Tracking number was updated for Packing Slip %s' % doc.packing_slip)
     else:
         frappe.msgprint('Cannot update tracking number for Packing Slip %s' % doc.packing_slip)
-    frappe.db.set_value('Packing Slip', doc.get('delivery_note'), 'oc_tracking_number', doc.get('tracking_number'))
+    set_db_val('Packing Slip', doc.get('delivery_note'), 'oc_tracking_number', doc.get('tracking_number'))
 
-    delivery_note = frappe.db.get_value('Packing Slip', doc.packing_slip, 'delivery_note')
-    if not frappe.db.get_value('Delivery Note', delivery_note, 'oc_tracking_number'):
-        frappe.db.set_value('Delivery Note', delivery_note, 'oc_tracking_number', doc.tracking_number)
+    delivery_note = get_db_val('Packing Slip', doc.packing_slip, 'delivery_note')
+    if not get_db_val('Delivery Note', delivery_note, 'oc_tracking_number'):
+        set_db_val('Delivery Note', delivery_note, 'oc_tracking_number', doc.tracking_number)
         frappe.msgprint('Tracking number was updated for Delivery Note %s' % delivery_note)
     else:
         frappe.msgprint('Cannot update tracking number for Delivery Note %s' % delivery_note)
 
-    if not frappe.db.get_value('Packing Slip', doc.packing_slip, 'fedex_shipment'):
-        frappe.db.set_value('Packing Slip', doc.packing_slip, 'fedex_shipment', doc.name)
+    if not get_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment'):
+        set_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment', doc.name)
     frappe.clear_cache()
 
 
 def before_cancel(doc, method=None):
     delete(doc)
-    frappe.db.set_value("Packing Slip", doc.packing_slip, "fedex_shipment", None)
+    set_db_val("Packing Slip", doc.packing_slip, "fedex_shipment", None)
 
 
 def make_pdf_canvas(doc_fedex_shipment):
@@ -101,8 +113,8 @@ def add_label_to_canvas(pdf_canvas, width, height, marging, label_image_data):
 def get_customer_references(doc_fedex_shipment):
     if not doc_fedex_shipment.packing_slip:
         frappe.throw("Please specify Packing Slip in Fedex Shipment")
-    dn = frappe.db.get_value("Packing Slip", doc_fedex_shipment.packing_slip, "delivery_note")
-    po_no = frappe.db.get_value("Delivery Note", dn, "po_no")
+    dn = get_db_val("Packing Slip", doc_fedex_shipment.packing_slip, "delivery_note")
+    po_no = get_db_val("Delivery Note", dn, "po_no")
     return (dn, po_no)
 
 
@@ -978,7 +990,7 @@ def make_fedex_shipment(source_name, target_doc=None):
                 target.recipient_contact_company_name = shipping_address.customer_name
             target.recipient_contact_phone_number = shipping_address.phone
 
-            customer_type = frappe.db.get_value('Customer', shipping_address.customer, 'customer_type')
+            customer_type = get_db_val('Customer', shipping_address.customer, 'customer_type')
             target.recipient_address_residential = 0 if customer_type == 'Company' else 1
         else:
             frappe.msgprint('Shipping Address is missed in Delivery Note %s' % doc_delivery_note.name)
@@ -1012,7 +1024,7 @@ def make_fedex_shipment(source_name, target_doc=None):
                 "idx": idx
             })
 
-    if frappe.db.get_value('Packing Slip', source_name, 'fedex_shipment') or frappe.db.get_value('Packing Slip', source_name, 'oc_tracking_number'):
+    if get_db_val('Packing Slip', source_name, 'fedex_shipment') or get_db_val('Packing Slip', source_name, 'oc_tracking_number'):
         frappe.throw('Cannot make new Fedex Shipment: either Fedex Shipment is already created or tracking number is set.')
 
     doclist = get_mapped_doc('Packing Slip', source_name, {
@@ -1037,7 +1049,7 @@ def get_address_details(address):
         address['state_or_province_code'] = countries.get_country_state_code(address.country, address.state)
         address['country_code'] = countries.get_country_code(address.country)
 
-        customer_type = frappe.db.get_value('Customer', address.customer, 'customer_type')
+        customer_type = get_db_val('Customer', address.customer, 'customer_type')
         address['residential'] = 0 if customer_type == 'Company' else 1
         return address
 
