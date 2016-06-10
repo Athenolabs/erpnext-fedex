@@ -11,7 +11,7 @@ app_email = "olhonko@gmail.com"
 app_version = "0.0.1"
 
 
-fixtures = [ "Custom Field" ]
+fixtures = [ "Delivery Note" ]
 
 # Includes in <head>
 # ------------------
