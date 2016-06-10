@@ -57,18 +57,20 @@ def before_submit(doc, method=None):
 
 
 def get_db_val(doc, filters, fieldname):
-   try:
-      return frappe.db.get_value(doc, filters, fieldname)
-   except:
-      return None
+    try:
+        return frappe.db.get_value(doc, filters, fieldname)
+    except:
+        return None
 
 def set_db_val(doctype, doc_name, field, value):
-   try:
-      return frappe.db.set_value(doctype, doc_type, field, value)
-   except:
-      return None
+    try:
+        return frappe.db.set_value(doctype, doc_type, field, value)
+    except:
+        return None
 
 def on_submit(doc, method=None):
+    with open('/tmp/kk', 'w') as f:
+        f.write(str(doc.tracking_number))
     if not get_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number'):
         #kk set_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number', doc.tracking_number)
         frappe.msgprint('Tracking number was updated for Packing Slip %s' % doc.packing_slip)
