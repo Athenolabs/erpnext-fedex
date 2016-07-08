@@ -2,6 +2,10 @@ from __future__ import unicode_literals
 import frappe, json
 import os.path
 
+
+#TODO: use database instead, and somehow
+#keep track of which
+#delivery note we have to return to
 @frappe.whitelist(allow_guest=True)
 def delno_need_submit(should_submit=None):
     fpath = '/tmp/fedex_shipment'
