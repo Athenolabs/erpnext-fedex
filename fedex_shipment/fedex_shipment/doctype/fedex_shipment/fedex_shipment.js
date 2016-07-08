@@ -27,6 +27,12 @@ cur_frm.cscript.recipient_address = function() {
 cur_frm.cscript.on_submit = function() {
     var me = this;
     frappe.call({
+        method: "fedex_shipment.digitools.delno_need_submit",
+        args: {should_submit:true},
+        callback: function (r) {console.log(r); }
+    });
+
+    frappe.call({
         freeze: true,
         method: "fedex_shipment.shipment.get_all_fedex_labels_file_url",
         args: {

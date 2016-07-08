@@ -71,28 +71,27 @@ def set_db_val(doctype, doc_name, field, value):
 def on_submit(doc, method=None):
     with open('/tmp/kk', 'w') as f:
         f.write(str(doc.tracking_number))
-    if not get_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number'):
-        #kk set_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number', doc.tracking_number)
-        frappe.msgprint('Tracking number was updated for Packing Slip %s' % doc.packing_slip)
-    else:
-        frappe.msgprint('Cannot update tracking number for Packing Slip %s' % doc.packing_slip)
-    set_db_val('Packing Slip', doc.get('delivery_note'), 'oc_tracking_number', doc.get('tracking_number'))
+    #if not get_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number'):
+    #    #kk set_db_val('Packing Slip', doc.packing_slip, 'oc_tracking_number', doc.tracking_number)
+    #    frappe.msgprint('Tracking number was updated for Packing Slip %s' % doc.packing_slip)
+    #else:
+    #    frappe.msgprint('Cannot update tracking number for Packing Slip %s' % doc.packing_slip)
+    #set_db_val('Packing Slip', doc.get('delivery_note'), 'oc_tracking_number', doc.get('tracking_number'))
 
-    delivery_note = get_db_val('Packing Slip', doc.packing_slip, 'delivery_note')
-    if not get_db_val('Delivery Note', delivery_note, 'oc_tracking_number'):
-        set_db_val('Delivery Note', delivery_note, 'oc_tracking_number', doc.tracking_number)
-        frappe.msgprint('Tracking number was updated for Delivery Note %s' % delivery_note)
-    else:
-        frappe.msgprint('Cannot update tracking number for Delivery Note %s' % delivery_note)
+    #delivery_note = get_db_val('Packing Slip', doc.packing_slip, 'delivery_note')
+    #if not get_db_val('Delivery Note', delivery_note, 'oc_tracking_number'):
+    #    set_db_val('Delivery Note', delivery_note, 'oc_tracking_number', doc.tracking_number)
+    #    frappe.msgprint('Tracking number was updated for Delivery Note %s' % delivery_note)
+    #else:
+    #    frappe.msgprint('Cannot update tracking number for Delivery Note %s' % delivery_note)
 
-    if not get_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment'):
-        set_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment', doc.name)
-    frappe.clear_cache()
-
+    #if not get_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment'):
+    #    set_db_val('Packing Slip', doc.packing_slip, 'fedex_shipment', doc.name)
+    #frappe.clear_cache()
 
 def before_cancel(doc, method=None):
     delete(doc)
-    set_db_val("Packing Slip", doc.packing_slip, "fedex_shipment", None)
+    #set_db_val("Packing Slip", doc.packing_slip, "fedex_shipment", None)
 
 
 def make_pdf_canvas(doc_fedex_shipment):
@@ -112,15 +111,17 @@ def add_label_to_canvas(pdf_canvas, width, height, marging, label_image_data):
         pdf_canvas.showPage()
 
 
-def get_customer_references(doc_fedex_shipment):
-    if not doc_fedex_shipment.packing_slip:
-        frappe.throw("Please specify Packing Slip in Fedex Shipment")
-    dn = get_db_val("Packing Slip", doc_fedex_shipment.packing_slip, "delivery_note")
-    po_no = get_db_val("Delivery Note", dn, "po_no")
-    return (dn, po_no)
-
+def get_customer_references(doc_fedex_shipment): #kk
+    #if not doc_fedex_shipment.packing_slip:
+    #    frappe.throw("Please specify Packing Slip in Fedex Shipment")
+    #dn = get_db_val("Packing Slip", doc_fedex_shipment.packing_slip, "delivery_note")
+    #po_no = get_db_val("Delivery Note", dn, "po_no")
+    return (0, 0) #(dn, po_no)
 
 def update_customer_references(doc_fedex_shipment, shipment, package):
+    pass
+
+def update_customer_references1(doc_fedex_shipment, shipment, package):
     dn_name, po_no = get_customer_references(doc_fedex_shipment)
     if dn_name:
         customer_reference = shipment.create_wsdl_object_of_type('CustomerReference')
