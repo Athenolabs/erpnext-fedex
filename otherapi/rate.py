@@ -14,10 +14,15 @@ import os.path
 file_path = os.path.abspath(__file__)
 dir_name = os.path.dirname(file_path)
 file_name = os.path.join(dir_name, "cred.cfg")
+print(file_name)
 
-CONF = FedexConfiguration(wsdls='beta', file_name='cred.cfg') #file_name)
-
-
+#wsdls='https://gatewaybeta.fedex.com:443' #/web-services/rate
+wsdls=None #'beta'
+#wsdls='https://gatewaybeta.fedex.com:443/web-services/' #/rate'
+#wsdls='https://ws.fedex.com:443/'
+CONF = FedexConfiguration(wsdls=wsdls, file_name=file_name) #file_name='cred.cfg') #file_name)
+#CONF = FedexConfiguration(wsdls=None, file_name='cred.cfg') #file_name)
+#CONF = FedexConfiguration(wsdls=None, key='', password='', account_number='', meter_number='')
 
 #serv = FedexService
 
@@ -189,8 +194,8 @@ class FedexTestCase:
 
 def main():
    f = FedexTestCase()
-   f.test_address_service()
-   #f.test_rate_service()
+   #f.test_address_service()
+   f.test_rate_service()
    #f.test_shipment_service()
    #f.test_tracking_service()
    #f.test_fedex_service()
