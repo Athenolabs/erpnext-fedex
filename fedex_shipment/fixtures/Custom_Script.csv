@@ -1,0 +1,64 @@
+"Data Import Template"
+"Table:","Custom Script"
+""
+""
+"Notes:"
+"Please do not change the template headings."
+"First data column must be blank."
+"If you are uploading new records, leave the ""name"" (ID) column blank."
+"If you are uploading new records, ""Naming Series"" becomes mandatory, if present."
+"Only mandatory fields are necessary for new records. You can delete non-mandatory columns if you wish."
+"For updating, you can update only selective columns."
+"You can only upload upto 5000 records in one go. (may be less in some cases)"
+""
+"DocType:","Custom Script","",""
+"Column Labels:","ID","DocType","Script"
+"Column Name:","name","dt","script"
+"Mandatory:","Yes","No","No"
+"Type:","Data (text)","Link","Code"
+"Info:","","Valid DocType",""
+"Start entering data below this line"
+"","""Delivery Note-Client""","Delivery Note","
+//cur_frm.add_fetch(""fedex_shipment"", ""self"", ""oc_tracking_number"");
+
+function on_err() {
+//me.frm.refresh();
+   console.log('submitted fail');
+}
+function on_succ() {
+ console.log('submitted');
+}
+
+function needs_submit_callback(r) {
+      console.log(r);
+      console.log('message:' + r.message[0]);
+      if (r.message[0] == 'true') {
+         cur_frm.savesubmit(null, on_succ, on_err);
+         $('button').each(function () {
+            console.log($(this).text());
+         });
+         frappe.call({
+             method: ""fedex_shipment.digitools.delno_need_submit"",
+             args: {should_submit:false},
+             callback: function (r) {console.log(r); }
+         });
+      } else setTimeout(main_loop, 2000);
+}
+
+function main_loop() {
+   frappe.call({
+      method: ""fedex_shipment.digitools.delno_need_submit"",
+      callback: needs_submit_callback
+   });
+}
+main_loop();
+
+/*frappe.ui.form.on(""Task"", {
+    refresh: function(frm) {
+
+        // use the __islocal value of doc, to check if the doc is saved or not
+        frm.set_df_property(""myfield"", ""read_only"", frm.doc.__islocal ? 0 : 1);
+    }
+});*/
+
+"
